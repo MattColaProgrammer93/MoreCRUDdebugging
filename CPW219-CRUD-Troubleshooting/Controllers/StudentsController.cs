@@ -12,10 +12,10 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
             context = dbContext;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             List<Student> products = StudentDb.GetStudents(context);
-            return View();
+            return View(products);
         }
 
         public IActionResult Create()
@@ -28,8 +28,12 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Add to database
                 StudentDb.Add(p, context);
-                ViewData["Message"] = $"{p.Name} was added!";
+
+                // Show success message on page
+                ViewData["Message"] = $"{p.Name} was made and added successfully!";
+
                 return View();
             }
 
@@ -42,18 +46,23 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
             //get the product by id
             Student p = StudentDb.GetStudent(context, id);
 
+            if (p == null)
+            {
+                return NotFound();
+            }
+
             //show it on web page
-            return View();
+            return View(p);
         }
 
         [HttpPost]
         public IActionResult Edit(Student p)
         {
-            if (ModelState.IsValid)
+            if (p != null)
             {
                 StudentDb.Update(context, p);
-                ViewData["Message"] = "Product Updated!";
-                return View(p);
+                TempData["Message"] = "Product Updated!";
+                return RedirectToAction("Index");
             }
             //return view with errors
             return View(p);
@@ -62,6 +71,12 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
         public IActionResult Delete(int id)
         {
             Student p = StudentDb.GetStudent(context, id);
+
+            if (p == null)
+            {
+                return NotFound();
+            }
+
             return View(p);
         }
 
@@ -71,8 +86,13 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
             //Get Product from database
             Student p = StudentDb.GetStudent(context, id);
 
-            StudentDb.Delete(context, p);
+            if (p != null)
+            {
+                TempData["Message"] = p.Name + " was deleted successfully";
+                StudentDb.Delete(context, p);
+            }
 
+            TempData["Message"] = "This student was already deleted";
             return RedirectToAction("Index");
         }
     }
