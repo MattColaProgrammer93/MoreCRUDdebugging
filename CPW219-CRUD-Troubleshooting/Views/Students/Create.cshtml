@@ -4,6 +4,15 @@
     ViewData["Title"] = "Create a student";
 }
 
+
+@if (ViewData["Message"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @ViewData["Message"]
+    </div>
+}
+else
+{
 <h1>Create a student</h1>
 
 <hr />
@@ -27,9 +36,10 @@
         </form>
     </div>
 </div>
+}
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to Student Roster</a>
 </div>
 
 @section Scripts {
